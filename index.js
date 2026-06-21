@@ -32,6 +32,7 @@ async function run() {
 
     const database = client.db("travel_ticket_db");
     const ticketCollections = database.collection("tickets");
+    const bookedTicketCollection = database.collection('booked_tickets')
 
     app.get("/api/tickets", async (req, res) => {
       const result = await ticketCollections.find().toArray();
@@ -97,6 +98,22 @@ app.patch("/api/ticket/status/:id" , async(req, res) => {
 
   res.send(result);
 })
+
+
+//-------------------User related API ----------------------------------
+
+app.get("/api/allBookedTickets" , async(req, res) => {
+  const result = await bookedTicketCollection.find().toArray();
+ res.send(result)
+})
+
+app.post("/api/bookedTicket", async(req, res) => {
+  const bookedTicket = req.body
+  const result = await bookedTicketCollection.insertOne(bookedTicket);
+  res.send(result);
+})
+
+
 
 
 
