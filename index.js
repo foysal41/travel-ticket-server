@@ -76,6 +76,24 @@ async function run() {
 });
 
 
+app.patch('/api/bookedTicket/status/:id', async(req, res) => {
+  const {id} = req.params;
+  const {status} = req.body;
+
+
+  const result = await bookedTicketCollection.updateOne(
+    {_id : new ObjectId(id)},
+    {
+      $set:{
+        status: status,
+      }
+    }
+  )
+
+  res.send(result)
+})
+
+
 
 
 //-------------------ADMIN related API ----------------------------------
