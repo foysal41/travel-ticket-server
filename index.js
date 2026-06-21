@@ -6,7 +6,7 @@ const port = 5000;
 
 app.use(cors());
 app.use(express.json());
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion , ObjectId } = require("mongodb");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
@@ -73,6 +73,33 @@ async function run() {
     });
   }
 });
+
+
+
+
+//-------------------ADMIN related API ----------------------------------
+app.patch("/api/ticket/status/:id" , async(req, res) => {
+  const {id}  = req.params;
+
+  const {status} = req.body;
+
+    console.log("ID:", id);
+  console.log("STATUS:", status);
+
+  const result = await ticketCollections.updateOne(
+    {_id: new ObjectId(id)},
+    {
+      $set:{
+        verificationStatus: status,
+      },
+    }
+  )
+
+  res.send(result);
+})
+
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
