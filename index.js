@@ -1,0 +1,91 @@
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const app = express();
+const port = 5000;
+
+app.use(cors());
+app.use(express.json());
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
+
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+const uri = process.env.MONGO_URI;
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+
+    const database = client.db("travel_ticket_db");
+    const ticketCollections = database.collection("tickets");
+
+    app.get("/api/tickets", async (req, res) => {
+      const result = await ticketCollections.find().toArray();
+      console.log(result);
+      res.send(result);
+    });
+
+    app.post("/api/createTicket", async (req, res) => {
+      const tickets = req.body;
+      const result = await ticketCollections.insertOne(tickets);
+      res.send(result);
+    });
+
+
+    //ticket update api
+  app.patch("/api/ticket/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    console.log("ID:", id);
+    console.log("DATA:", updateData);
+
+    const result = await ticketCollections.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          ...updateData,
+          verificationStatus: "pending",
+        },
+      }
+    );
+
+    res.send(result);
+  } catch (error) {
+    console.error("PATCH ERROR:", error);
+    res.status(500).send({
+      message: error.message,
+    });
+  }
+});
+
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!",
+    );
+  } finally {
+    // Ensures that the client will close when you finish/error
+    // await client.close();
+  }
+}
+run().catch(console.dir);
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
