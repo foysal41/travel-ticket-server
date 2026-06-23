@@ -94,6 +94,33 @@ app.patch('/api/bookedTicket/status/:id', async(req, res) => {
 })
 
 
+app.patch('/api/tickets/reduce-quantity/:id' , async(req, res)=> {
+  const id = req.params.id;
+  const {bookingQuantity} = req.body;
+
+  const ticket = await ticketCollections.findOne({
+    _id: new ObjectId(id),
+  });
+
+
+  const updateQuantity = Number(ticket.quantity) = Number(bookingQuantity);
+
+  const result = await ticketCollections.updateOne(
+    {_id: new ObjectId(id)},
+    {
+      $set: {
+        quantity:String(updateQuantity)
+      }
+    }
+  )
+
+  res.send(result)
+
+
+
+})
+
+
 
 
 //-------------------ADMIN related API ----------------------------------
@@ -117,6 +144,25 @@ app.patch("/api/ticket/status/:id" , async(req, res) => {
   res.send(result);
 })
 
+// app.patch("/api/advertiseTicket/status/:id", async (req, res) => {
+//   const { id } = req.params;
+//    const { ticketDisplayByAdmin } = req.body;
+
+//   console.log("ads id:", id);
+//   console.log("ads status:", status);
+
+//   const result = await ticketCollections.updateOne(
+//     { _id: new ObjectId(id) },
+//     {
+//       $set: {
+//        ticketDisplayByAdmin,
+//       },
+//     }
+//   );
+
+//   res.send(result);
+// });
+
 
 //-------------------User related API ----------------------------------
 
@@ -137,7 +183,7 @@ app.post("/api/bookedTicket", async(req, res) => {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
     );
