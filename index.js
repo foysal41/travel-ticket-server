@@ -2,13 +2,14 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
+
 
 app.use(cors());
 app.use(express.json());
 const { MongoClient, ServerApiVersion , ObjectId } = require("mongodb");
-const dns = require("dns");
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+// const dns = require("dns");
+// dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -28,7 +29,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const database = client.db("travel_ticket_db");
     const ticketCollections = database.collection("tickets");
